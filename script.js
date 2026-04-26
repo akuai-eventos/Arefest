@@ -205,6 +205,28 @@ async function cargarStockVisual() {
   actualizarResumenPedido();
 }
 
+async function cargarTasaBCV() {
+  try {
+    setText("tasa-bcv-text", "Cargando...");
+    setText("total-bs-text", "Cargando...");
+
+    const response = await fetch(`${WEB_APP_URL}?action=bcv`);
+    const data = await response.json();
+
+    if (data.ok && Number(data.tasa) > 0) {
+      TASA_BCV = Number(data.tasa);
+    } else {
+      TASA_BCV = 0;
+    }
+
+  } catch (error) {
+    console.warn("Error cargando tasa BCV:", error);
+    TASA_BCV = 0;
+  }
+
+  actualizarResumenPedido();
+}
+
 function resetearSabores() {
   document.querySelectorAll("[data-sabor]").forEach(input => {
     input.value = 0;
