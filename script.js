@@ -318,12 +318,29 @@ async function mostrarExito() {
       boton.textContent = "Guardando...";
     }
 
+    const datos = new URLSearchParams();
+    datos.append("action", "reservar");
+    datos.append("nombre", reservaPendiente.comprador);
+    datos.append("cedula", reservaPendiente.cedula);
+    datos.append("whatsapp", reservaPendiente.whatsapp);
+    datos.append("email", reservaPendiente.email);
+    datos.append("semestre", reservaPendiente.semestre);
+    datos.append("vendedor", reservaPendiente.vendedor);
+    datos.append("modalidad", reservaPendiente.modalidad);
+    datos.append("combos", reservaPendiente.combos);
+    datos.append("catira", reservaPendiente.catira);
+    datos.append("pelua", reservaPendiente.pelua);
+    datos.append("reina", reservaPendiente.reina);
+    datos.append("rumbera", reservaPendiente.rumbera);
+    datos.append("akuai", reservaPendiente.akuai);
+    datos.append("bebida", reservaPendiente.bebida);
+    datos.append("metodo", reservaPendiente.metodo);
+    datos.append("referencia", reservaPendiente.referencia);
+    datos.append("capture", reservaPendiente.capture_nombre);
+
     const response = await fetch(WEB_APP_URL, {
       method: "POST",
-      body: JSON.stringify({
-        action: "reservar",
-        reserva: reservaPendiente
-      })
+      body: datos
     });
 
     const data = await response.json();
