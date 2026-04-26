@@ -85,7 +85,7 @@ async function cargarTasaBCV() {
     setText("tasa-bcv-text", "Cargando...");
     setText("total-bs-text", "Cargando...");
 
-    const response = await fetch(`${WEB_APP_URL}?action=rate`);
+    const response = await fetch(`${WEB_APP_URL}?action=bcv`);
     const data = await response.json();
 
     if (data.ok && Number(data.tasa) > 0) {
