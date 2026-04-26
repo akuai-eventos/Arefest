@@ -986,3 +986,122 @@ footer {
   color: #555;
   font-size: 14px;
 }
+.gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 20px;
+}
+
+.card {
+  position: relative;
+  overflow: hidden;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card img {
+  width: 100%;
+  height: 280px;
+  object-fit: cover;
+  display: block;
+}
+
+.card-info {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  padding: 15px;
+  background: linear-gradient(to top, rgba(0,0,0,0.7), transparent);
+  color: white;
+}
+
+.card:hover {
+  transform: translateY(-8px) scale(1.03);
+  box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+}
+
+/* MODAL */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 999;
+  inset: 0;
+  background: rgba(0,0,0,0.7);
+  backdrop-filter: blur(5px);
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-content {
+  background: white;
+  padding: 25px;
+  border-radius: 20px;
+  max-width: 400px;
+  text-align: center;
+  animation: zoomIn 0.3s ease;
+}
+
+.modal-content img {
+  width: 100%;
+  border-radius: 15px;
+  margin-bottom: 15px;
+}
+
+.cerrar {
+  position: absolute;
+  top: 15px;
+  right: 20px;
+  font-size: 25px;
+  cursor: pointer;
+}
+
+@keyframes zoomIn {
+  from { transform: scale(0.7); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+/* =========================
+   SEPARADOR CON PICO (SVG PRO)
+========================= */
+.section-divider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  margin: -20px 0 30px;
+  padding: 10px 0;
+  color: var(--orange);
+}
+
+.section-divider::before,
+.section-divider::after {
+  content: "";
+  height: 1px;
+  flex: 1;
+  max-width: 180px;
+  background: linear-gradient(90deg, transparent, rgba(224,122,31,0.55), transparent);
+}
+
+.section-divider .divider-icon {
+  width: 56px;
+  height: auto;
+  display: block;
+  shape-rendering: geometricPrecision;
+  transform: translateZ(0);
+  filter: drop-shadow(0 10px 20px rgba(224,122,31,0.18));
+  opacity: 0.98;
+}
+
+@media (max-width: 600px) {
+  .section-divider {
+    margin: -10px 0 22px;
+  }
+  .section-divider::before,
+  .section-divider::after {
+    max-width: 120px;
+  }
+  .section-divider .divider-icon {
+    width: 46px;
+  }
+}

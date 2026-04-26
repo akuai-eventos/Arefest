@@ -412,6 +412,8 @@ async function mostrarExito() {
     datos.append("metodo", reservaPendiente.metodo);
     datos.append("referencia", reservaPendiente.referencia);
     datos.append("capture", reservaPendiente.capture_nombre);
+    datos.append("capture_base64", reservaPendiente.capture_base64);
+datos.append("capture_nombre", reservaPendiente.capture_nombre);
 
     const response = await fetch(WEB_APP_URL, {
       method: "POST",
@@ -499,3 +501,22 @@ function actualizarHora() {
 
 setInterval(actualizarHora, 1000);
 actualizarHora();
+
+function abrirPonente(img, nombre, titulo, desc) {
+  document.getElementById("modal-img").src = img;
+  document.getElementById("modal-nombre").textContent = nombre;
+  document.getElementById("modal-titulo").textContent = titulo;
+  document.getElementById("modal-desc").textContent = desc;
+
+  document.getElementById("modal-ponente").style.display = "flex";
+}
+
+function cerrarPonente() {
+  document.getElementById("modal-ponente").style.display = "none";
+}
+window.onclick = function(event) {
+  const modal = document.getElementById("modal-ponente");
+  if (event.target === modal) {
+    cerrarPonente();
+  }
+};
