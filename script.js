@@ -1,6 +1,6 @@
 document.getElementById("year").textContent = new Date().getFullYear();
 
-const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwNP12s66JC1i1TL9b3aqVuVTjIuWx2JbjBU5oAVhV0KEu2MZdQwpXub00stAk36oRgQQ/exec";
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzvD68OutaasdqHyPdLr8zr7CLiMaTnCjgVkzNRZdqW0_1qaQamTuoXe1EJLtbg4epqUA/exec";
 const form = document.getElementById("akuaiForm");
 const modalConfirm = document.getElementById("modal-confirm");
 const modalSuccess = document.getElementById("modal-success");
