@@ -6,6 +6,10 @@ const modalConfirm = document.getElementById("modal-confirm");
 const modalSuccess = document.getElementById("modal-success");
 const modalMessage = document.getElementById("modal-message");
 
+const TOTAL_INICIAL_COMBOS = 162;
+let ultimoStockDomino = null;
+let intervaloStock = null;
+
 const PRECIO_COMBO_USD = 5;
 let TASA_BCV = 0;
 let reservaPendiente = null;
@@ -66,9 +70,19 @@ function limpiarNombreArchivo(texto) {
 function mostrarFormulario() {
   document.getElementById("form-wrapper").style.display = "block";
   document.getElementById("cta-content").style.display = "none";
-  document.getElementById("unete").scrollIntoView({ behavior:"smooth" });
+  document.getElementById("unete").scrollIntoView({ behavior: "smooth" });
+
   cargarStockVisual();
   cargarTasaBCV();
+  iniciarStockEnTiempoReal();
+}
+
+function iniciarStockEnTiempoReal() {
+  if (intervaloStock) clearInterval(intervaloStock);
+
+  intervaloStock = setInterval(() => {
+    cargarStockVisual();
+  }, 15000);
 }
 
 function cerrarFormulario() {
@@ -100,10 +114,26 @@ async function cargarStockVisual() {
     const response = await fetch(`${WEB_APP_URL}?action=stock`);
     const data = await response.json();
 
+    // 🔥 SI TODO ESTÁ AGOTADO
+    if (data.cerrado) {
+      document.getElementById("akuaiForm").style.display = "none";
+      setText("stock-message", "🔥 VENTAS CERRADAS - TODO AGOTADO");
+      setText("stock-progress-text", "AGOTADO");
+
+      const barra = document.getElementById("stock-progress-fill");
+      if (barra) {
+        barra.style.width = "100%";
+        barra.style.background = "#c62828";
+      }
+
+      return;
+    }
+
     if (!data.ok) {
       throw new Error(data.error || "No se pudo cargar el stock.");
     }
 
+    // 🔥 STOCK ACTUAL
     stockSabores = {
       "Catira": Number(data.stock["Catira"] || 0),
       "Pelúa": Number(data.stock["Pelúa"] || 0),
@@ -113,6 +143,51 @@ async function cargarStockVisual() {
       "Dominó": Number(data.stock["Dominó"] || 0)
     };
 
+    const disponiblesCombos = stockSabores["Dominó"];
+    const vendidos = TOTAL_INICIAL_COMBOS - disponiblesCombos;
+    const porcentaje = Math.max(0, Math.min(100, (vendidos / TOTAL_INICIAL_COMBOS) * 100));
+
+    // 🔥 TEXTO INTELIGENTE
+    let texto = "";
+
+    if (disponiblesCombos <= 0) {
+      texto = "🔥 AGOTADO";
+    } else if (disponiblesCombos <= 10) {
+      texto = `⚠️ Últimos ${disponiblesCombos} combos`;
+    } else {
+      texto = `${disponiblesCombos} disponibles de ${TOTAL_INICIAL_COMBOS}`;
+    }
+
+    setText("stock-progress-text", texto);
+
+    // 🔥 BARRA ANIMADA
+    const barra = document.getElementById("stock-progress-fill");
+
+    if (barra) {
+      barra.style.width = "0%";
+
+      setTimeout(() => {
+        barra.style.width = `${porcentaje}%`;
+
+        // 🎨 COLOR DINÁMICO
+        if (porcentaje >= 85) {
+          barra.style.background = "#c62828"; // rojo
+        } else if (porcentaje >= 55) {
+          barra.style.background = "#f9a825"; // amarillo
+        } else {
+          barra.style.background = "#2e7d32"; // verde
+        }
+      }, 200);
+    }
+
+    // 🔥 DETECTAR VENTAS (ANIMACIÓN +1)
+    if (ultimoStockDomino !== null && disponiblesCombos < ultimoStockDomino) {
+      animarVentaDetectada(ultimoStockDomino - disponiblesCombos);
+    }
+
+    ultimoStockDomino = disponiblesCombos;
+
+    // UI NORMAL
     setText("precio-combo-card", PRECIO_COMBO_USD);
     setText("stock-message", "Selecciona cantidades según disponibilidad real.");
 
@@ -125,27 +200,6 @@ async function cargarStockVisual() {
   } catch (error) {
     console.warn("Error cargando stock:", error);
     setText("stock-message", "No se pudo cargar el stock. Intenta nuevamente.");
-  }
-
-  actualizarResumenPedido();
-}
-
-async function cargarTasaBCV() {
-  try {
-    setText("tasa-bcv-text", "Cargando...");
-    setText("total-bs-text", "Cargando...");
-
-    const response = await fetch(`${WEB_APP_URL}?action=bcv`);
-    const data = await response.json();
-
-    if (data.ok && Number(data.tasa) > 0) {
-      TASA_BCV = Number(data.tasa);
-    } else {
-      TASA_BCV = 0;
-    }
-  } catch (error) {
-    console.warn("No se pudo cargar la tasa BCV:", error);
-    TASA_BCV = 0;
   }
 
   actualizarResumenPedido();
@@ -552,3 +606,94 @@ window.onclick = function(event) {
     cerrarPonente();
   }
 };
+
+function actualizarBarraStock(disponiblesCombos) {
+  const vendidos = TOTAL_INICIAL_COMBOS - disponiblesCombos;
+  const porcentaje = Math.max(0, Math.min(100, (vendidos / TOTAL_INICIAL_COMBOS) * 100));
+
+  let texto = "";
+
+  if (disponiblesCombos <= 0) {
+    texto = "🔥 AGOTADO";
+  } else if (disponiblesCombos <= 10) {
+    texto = `⚠️ Últimos ${disponiblesCombos} combos`;
+  } else {
+    texto = `${disponiblesCombos} disponibles de ${TOTAL_INICIAL_COMBOS}`;
+  }
+
+  setText("stock-progress-text", texto);
+
+  const barra = document.getElementById("stock-progress-fill");
+
+  if (barra) {
+    barra.style.width = `${porcentaje}%`;
+
+    if (porcentaje >= 85) {
+      barra.style.background = "#c62828";
+    } else if (porcentaje >= 55) {
+      barra.style.background = "#f9a825";
+    } else {
+      barra.style.background = "#2e7d32";
+    }
+  }
+}
+
+function animarVentaDetectada(cantidad = 1) {
+  const hype = document.getElementById("stock-hype-message");
+  if (!hype) return;
+
+  hype.textContent = cantidad === 1
+    ? "+1 combo vendido"
+    : `+${cantidad} combos vendidos`;
+
+  hype.classList.remove("show");
+  void hype.offsetWidth;
+  hype.classList.add("show");
+}
+
+async function actualizarStockEnTiempoReal() {
+  try {
+    const response = await fetch(`${WEB_APP_URL}?action=stock`);
+    const data = await response.json();
+
+    if (!data.ok) return;
+
+    const nuevoStockDomino = Number(data.stock["Dominó"] || 0);
+
+    stockSabores = {
+      "Catira": Number(data.stock["Catira"] || 0),
+      "Pelúa": Number(data.stock["Pelúa"] || 0),
+      "Reina Pepiada": Number(data.stock["Reina Pepiada"] || 0),
+      "Rumbera": Number(data.stock["Rumbera"] || 0),
+      "Akuai": Number(data.stock["Akuai"] || 0),
+      "Dominó": nuevoStockDomino
+    };
+
+    pintarStock("stock-catira", "flavor-catira", stockSabores["Catira"]);
+    pintarStock("stock-pelua", "flavor-pelua", stockSabores["Pelúa"]);
+    pintarStock("stock-reina", "flavor-reina", stockSabores["Reina Pepiada"]);
+    pintarStock("stock-rumbera", "flavor-rumbera", stockSabores["Rumbera"]);
+    pintarStock("stock-akuai", "flavor-akuai", stockSabores["Akuai"]);
+
+    actualizarBarraStock(nuevoStockDomino);
+
+    if (ultimoStockDomino !== null && nuevoStockDomino < ultimoStockDomino) {
+      animarVentaDetectada(ultimoStockDomino - nuevoStockDomino);
+    }
+
+    ultimoStockDomino = nuevoStockDomino;
+
+    if (data.cerrado || nuevoStockDomino <= 0) {
+      setText("stock-message", "🔥 VENTAS CERRADAS - TODO AGOTADO");
+
+      const submitBtn = document.querySelector(".submit-btn");
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.textContent = "Ventas cerradas";
+      }
+    }
+
+  } catch (error) {
+    console.warn("No se pudo actualizar stock en tiempo real:", error);
+  }
+}
