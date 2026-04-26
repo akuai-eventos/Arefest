@@ -265,6 +265,29 @@ function cambiarSabor(inputId, cambio) {
   actualizarResumenPedido();
 }
 
+function cambiarCombos(cambio) {
+  const input = document.getElementById("f-combos");
+  let valorActual = Number(input.value || 1);
+  let nuevoValor = valorActual + cambio;
+
+  if (nuevoValor < 1) nuevoValor = 1;
+
+  if (nuevoValor > 10) {
+    mostrarMensaje("Puedes reservar hasta 10 combos por pedido. Si deseas más, realiza otra reserva.");
+    nuevoValor = 10;
+  }
+
+  if (nuevoValor > stockSabores["Dominó"]) {
+    mostrarMensaje(`No hay suficiente stock de combos. Disponible: ${stockSabores["Dominó"]}.`);
+    nuevoValor = stockSabores["Dominó"];
+  }
+
+  input.value = nuevoValor;
+
+  resetearSabores();
+  actualizarResumenPedido();
+}
+
 function obtenerSaboresSeleccionados() {
   const inputs = document.querySelectorAll("[data-sabor]");
   const sabores = [];
@@ -719,3 +742,4 @@ async function actualizarStockEnTiempoReal() {
     console.warn("No se pudo actualizar stock en tiempo real:", error);
   }
 }
+
