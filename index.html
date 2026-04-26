@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Akuai Eventos | Aparta tu combo</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;800;900&family=Playfair+Display:wght@700&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+
+<div id="modal-confirm" class="modal-overlay">
+  <div class="custom-modal">
+    <h3>Verifica tus datos</h3>
+    <p>Confirma que tu información es correcta:</p>
+
+    <div class="modal-info">
+      <p><strong>Nombre:</strong> <span id="confirm-name"></span></p>
+      <p><strong>Email:</strong> <span id="confirm-email"></span></p>
+      <p><strong>Vendedor:</strong> <span id="confirm-vendedor"></span></p>
+      <p><strong>Modalidad:</strong> <span id="confirm-modalidad"></span></p>
+      <p><strong>Combo:</strong> <span id="confirm-combo"></span></p>
+      <p><strong>Bebida:</strong> <span id="confirm-bebida"></span></p>
+      <p><strong>Método:</strong> <span id="confirm-metodo"></span></p>
+      <p><strong>Referencia:</strong> <span id="confirm-referencia"></span></p>
+      <p><strong>Capture:</strong> <span id="confirm-capture"></span></p>
+      <p><strong>Total USD:</strong> <span id="confirm-total-usd"></span></p>
+      <p><strong>Tasa BCV:</strong> <span id="confirm-tasa-bcv"></span></p>
+      <p><strong>Total Bs:</strong> <span id="confirm-total-bs"></span></p>
+    </div>
+
+    <div class="modal-buttons">
+      <button class="btn-cancel" onclick="cerrarConfirm()">Editar</button>
+      <button class="btn-confirm" onclick="mostrarExito()">Sí, reservar</button>
+    </div>
+  </div>
+</div>
+
+<div id="modal-success" class="modal-overlay">
+  <div class="custom-modal">
+    <div class="success-icon">✓</div>
+    <h3>¡Reserva recibida!</h3>
+    <p>Vista de prueba. Luego conectaremos esto con Sheets, Drive, tasa BCV y ticket.</p>
+    <button class="btn-confirm full-btn" onclick="enviarFinal()">Finalizar</button>
+  </div>
+</div>
+
+<header>
+  <div class="wrap topbar">
+    <a href="#" class="brand">
+      <div class="logo"><img src="isotipopng.png" alt="Akuai"></div>
+      <div>
+        <strong>Akuai Eventos</strong>
+        <span>@akuai_eventos · Mérida</span>
+      </div>
+    </a>
+
+    <nav>
+      <a href="#">Inicio</a>
+      <a href="#conocenos">Conócenos</a>
+      <a href="#eventos">Evento</a>
+      <a href="#galeria">Galería</a>
+      <a href="#aliados">Patrocinantes</a>
+      <a href="#unete">Aparta tu combo</a>
+      <a href="#contacto">Donaciones</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+
+<section class="hero">
+  <div class="hero-grid">
+    <div class="hero-card">
+      <div class="badge">Hotel Escuela de los Andes Venezolanos · Gestión Turística</div>
+      <h1>Elevando sueños y transformando realidades.</h1>
+      <p class="lead">Excelencia y calidad en cada detalle.</p>
+      <button onclick="mostrarFormulario()" class="btn-main">Aparta tu combo</button>
+    </div>
+
+    <div class="stat-card">
+      <h3>Sobre Akuai</h3>
+      <p>Nuestro nombre proviene de “a kuai”, que significa <strong>altura</strong> en warao, y refleja nuestra esencia: elevar ideas, sueños y capacidades.</p>
+      <a href="https://instagram.com/akuai_eventos" target="_blank" class="btn-main ghost-btn">Ver Instagram</a>
+    </div>
+  </div>
+</section>
+
+<section id="conocenos" class="reveal">
+  <h2 class="section-title">Conócenos</h2>
+
+  <div class="intro-text">
+    <p><strong>Akuai Eventos</strong> es más que una organizadora de eventos: es un laboratorio de experiencias donde los estudiantes convierten ideas en realidades.</p>
+  </div>
+
+  <div class="about-grid">
+    <div class="about-card">
+      <h4>Nuestra Misión</h4>
+      <p>Formar y empoderar a los estudiantes a través de la planificación y ejecución de eventos temáticos que integren educación, motivación y comunidad.</p>
+    </div>
+
+    <div class="about-card">
+      <h4>Nuestra Visión</h4>
+      <p>Ser la plataforma universitaria referente en la creación de eventos formativos e innovadores, elevando el talento estudiantil.</p>
+    </div>
+
+    <div class="about-card">
+      <h4>Objetivo</h4>
+      <p>Crear experiencias significativas que permitan aprender haciendo, conectar con la comunidad y fortalecer competencias profesionales.</p>
+    </div>
+  </div>
+</section>
+
+<section id="eventos" class="reveal">
+  <h2 class="section-title">Evento gastronómico</h2>
+
+  <div class="hero-card event-card">
+    <span class="badge">Venta especial</span>
+    <h1>Arepazo Akuai</h1>
+    <p class="lead">Cada combo incluye <strong>1 arepa Dominó</strong>, <strong>1 arepa a elección</strong> y <strong>1 bebida</strong>.</p>
+
+    <div class="info-grid">
+      <div>
+        <strong>Combos disponibles</strong><br>
+        <span>162 combos</span>
+      </div>
+      <div>
+        <strong>Total arepas</strong><br>
+        <span>324 arepas</span>
+      </div>
+      <div>
+        <strong>Bebida</strong><br>
+        <span>Café o Papelón con Limón</span>
+      </div>
+    </div>
+
+    <button onclick="mostrarFormulario()" class="btn-main top-space">Apartar mi combo</button>
+  </div>
+</section>
+
+<section id="galeria" class="reveal">
+  <h2 class="section-title">Fotos del evento</h2>
+
+  <div class="gallery-grid">
+    <div class="gallery-item">
+      <img src="trm.png" alt="Evento Akuai">
+      <div class="gallery-overlay">
+        <h3>Akuai Eventos</h3>
+        <p>Experiencias formativas</p>
+      </div>
+    </div>
+
+    <div class="gallery-item">
+      <img src="foto-arepazo.jpg" alt="Arepazo">
+      <div class="gallery-overlay">
+        <h3>El Arepazo</h3>
+        <p>Memorias gastronómicas</p>
+      </div>
+    </div>
+
+    <div class="gallery-item">
+      <img src="banner.png" alt="Comunidad">
+      <div class="gallery-overlay">
+        <h3>Comunidad</h3>
+        <p>Aprender haciendo</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="aliados" class="reveal">
+  <h2 class="section-title">Patrocinantes</h2>
+  <p class="section-text">Agradecemos a las marcas y aliados que hacen posible esta actividad.</p>
+
+  <div class="slider">
+    <div class="slide-track">
+      <div class="slide"><img src="suraki.png" alt="Aliado 1"></div>
+      <div class="slide"><img src="logo2.png" alt="Aliado 2"></div>
+      <div class="slide"><img src="logo3.png" alt="Aliado 3"></div>
+      <div class="slide"><img src="logo4.png" alt="Aliado 4"></div>
+      <div class="slide"><img src="logo5.png" alt="Aliado 5"></div>
+      <div class="slide"><img src="logo6.png" alt="Aliado 6"></div>
+      <div class="slide"><img src="logo7.png" alt="Aliado 7"></div>
+      <div class="slide"><img src="suraki.png" alt="Aliado 1"></div>
+      <div class="slide"><img src="logo2.png" alt="Aliado 2"></div>
+      <div class="slide"><img src="logo3.png" alt="Aliado 3"></div>
+      <div class="slide"><img src="logo4.png" alt="Aliado 4"></div>
+      <div class="slide"><img src="logo5.png" alt="Aliado 5"></div>
+      <div class="slide"><img src="logo6.png" alt="Aliado 6"></div>
+      <div class="slide"><img src="logo7.png" alt="Aliado 7"></div>
+    </div>
+  </div>
+</section>
+
+<section id="unete" class="cta-registry reveal">
+  <h2 class="section-title">Aparta tu combo</h2>
+
+  <div id="cta-content" class="cta-content">
+    <p>Reserva tu combo de arepas. Cada combo incluye <strong>1 arepa Dominó obligatoria</strong>, <strong>1 arepa a elección</strong> y <strong>1 bebida</strong>.</p>
+
+    <div class="info-grid cta-grid">
+      <div>
+        <strong>Combo</strong><br>
+        <span>Dominó + sabor + bebida</span>
+      </div>
+      <div>
+        <strong>Precio</strong><br>
+        <span>$<span id="precio-combo-card">5</span> por combo</span>
+      </div>
+      <div>
+        <strong>Entrega</strong><br>
+        <span>Dentro de la universidad</span>
+      </div>
+    </div>
+
+    <button onclick="mostrarFormulario()" class="btn-main big-btn">Apartar mi combo</button>
+  </div>
+
+  <div id="form-wrapper">
+    <div class="form-container">
+      <h3>Formulario de reserva</h3>
+
+      <form id="akuaiForm">
+        <div class="section-title-form">1. Datos del comprador</div>
+
+        <div class="question-box">
+          <label>Nombre completo <span>*</span></label>
+          <input type="text" name="nombre" id="f-nombre" class="input-field" required placeholder="Nombre y apellido">
+        </div>
+
+        <div class="question-box">
+          <label>Cédula <span>*</span></label>
+          <input type="text" name="cedula" id="f-cedula" class="input-field" required placeholder="V-00000000">
+        </div>
+
+        <div class="question-box">
+          <label>WhatsApp <span>*</span></label>
+          <input type="tel" name="whatsapp" id="f-whatsapp" class="input-field" required placeholder="+58 4xx-xxxxxxx">
+        </div>
+
+        <div class="question-box">
+          <label>Correo electrónico <span>*</span></label>
+          <input type="email" name="email" id="f-email" class="input-field" required placeholder="correo@ejemplo.com">
+        </div>
+
+        <div class="question-box">
+          <label>Semestre/Trayecto del comprador <span>*</span></label>
+          <input type="text" name="semestre" id="f-semestre" class="input-field" required placeholder="Ej: 4to semestre / Trayecto II">
+        </div>
+
+        <div class="section-title-form">2. Datos del vendedor</div>
+
+        <div class="question-box">
+          <label>Vendedor responsable <span>*</span></label>
+          <input type="text" name="vendedor" id="f-vendedor" class="input-field" required placeholder="Nombre del estudiante vendedor">
+        </div>
+
+        <div class="section-title-form">3. Modalidad</div>
+
+        <div class="question-box">
+          <label>¿Te quedarás en las ponencias? <span>*</span></label>
+          <div class="grid-options">
+            <label class="option-item">
+              <input type="radio" name="modalidad" value="Ponencias" required>
+              Sí, me quedaré.
+            </label>
+            <label class="option-item">
+              <input type="radio" name="modalidad" value="Solo retiro">
+              No, solo compro y me retiro.
+            </label>
+          </div>
+        </div>
+
+        <div class="section-title-form">4. Selección del combo</div>
+
+        <div class="question-box">
+          <label>Paso 1: Cantidad de combos <span>*</span></label>
+          <input type="number" name="combos" id="f-combos" class="input-field" required min="1" max="5" value="1" oninput="resetearSabores();actualizarResumenPedido();">
+          <p class="helper-text">Cada combo incluye 1 Dominó + 1 sabor a elección + 1 bebida.</p>
+        </div>
+
+        <div class="question-box">
+          <label>Sabor fijo</label>
+          <div class="fixed-flavor">Dominó incluida en cada combo</div>
+        </div>
+
+        <div class="question-box">
+          <label>Paso 2: Sabores a elección <span>*</span></label>
+          <p class="helper-text">Usa los botones + y -. Si apartas 2 combos, debes elegir 2 sabores en total.</p>
+          <div id="stock-message" class="helper-text">Cargando disponibilidad...</div>
+
+          <div class="flavor-box">
+            <div class="flavor-row">
+              <div>
+                <strong>Catira</strong>
+                <small id="stock-catira">Disponible: --</small>
+              </div>
+              <div class="qty-control">
+                <button type="button" class="qty-btn qty-minus" onclick="cambiarSabor('flavor-catira',-1)">−</button>
+                <input type="number" min="0" value="0" id="flavor-catira" data-sabor="Catira" readonly>
+                <button type="button" class="qty-btn qty-plus" onclick="cambiarSabor('flavor-catira',1)">+</button>
+              </div>
+            </div>
+
+            <div class="flavor-row">
+              <div>
+                <strong>Pelúa</strong>
+                <small id="stock-pelua">Disponible: --</small>
+              </div>
+              <div class="qty-control">
+                <button type="button" class="qty-btn qty-minus" onclick="cambiarSabor('flavor-pelua',-1)">−</button>
+                <input type="number" min="0" value="0" id="flavor-pelua" data-sabor="Pelúa" readonly>
+                <button type="button" class="qty-btn qty-plus" onclick="cambiarSabor('flavor-pelua',1)">+</button>
+              </div>
+            </div>
+
+            <div class="flavor-row">
+              <div>
+                <strong>Reina Pepiada</strong>
+                <small id="stock-reina">Disponible: --</small>
+              </div>
+              <div class="qty-control">
+                <button type="button" class="qty-btn qty-minus" onclick="cambiarSabor('flavor-reina',-1)">−</button>
+                <input type="number" min="0" value="0" id="flavor-reina" data-sabor="Reina Pepiada" readonly>
+                <button type="button" class="qty-btn qty-plus" onclick="cambiarSabor('flavor-reina',1)">+</button>
+              </div>
+            </div>
+
+            <div class="flavor-row">
+              <div>
+                <strong>Rumbera</strong>
+                <small id="stock-rumbera">Disponible: --</small>
+              </div>
+              <div class="qty-control">
+                <button type="button" class="qty-btn qty-minus" onclick="cambiarSabor('flavor-rumbera',-1)">−</button>
+                <input type="number" min="0" value="0" id="flavor-rumbera" data-sabor="Rumbera" readonly>
+                <button type="button" class="qty-btn qty-plus" onclick="cambiarSabor('flavor-rumbera',1)">+</button>
+              </div>
+            </div>
+
+            <div class="flavor-row">
+              <div>
+                <strong>Akuai</strong>
+                <small id="stock-akuai">Disponible: --</small>
+              </div>
+              <div class="qty-control">
+                <button type="button" class="qty-btn qty-minus" onclick="cambiarSabor('flavor-akuai',-1)">−</button>
+                <input type="number" min="0" value="0" id="flavor-akuai" data-sabor="Akuai" readonly>
+                <button type="button" class="qty-btn qty-plus" onclick="cambiarSabor('flavor-akuai',1)">+</button>
+              </div>
+            </div>
+          </div>
+
+          <div id="flavor-summary" class="helper-text">Has seleccionado 0 de 1 sabor(es) a elección.</div>
+        </div>
+
+        <div class="section-title-form">5. Bebida</div>
+
+        <div class="question-box">
+          <label>Paso 3: Selecciona una bebida <span>*</span></label>
+          <p class="helper-text">Selecciona una sola bebida para todos los combos de este pedido.</p>
+
+          <div class="grid-options">
+            <label class="option-item">
+              <input type="radio" name="bebida" value="Café" required onchange="actualizarResumenPedido()">
+              Café
+            </label>
+            <label class="option-item">
+              <input type="radio" name="bebida" value="Papelón con Limón" onchange="actualizarResumenPedido()">
+              Papelón con Limón
+            </label>
+          </div>
+
+          <div id="drink-summary" class="helper-text">No has seleccionado bebida.</div>
+        </div>
+
+        <div class="section-title-form">6. Total</div>
+
+        <div class="question-box">
+          <div class="total-box">
+            <div class="total-line">
+              <span>Precio por combo</span>
+              <strong>$<span id="precio-combo-text">5.00</span></strong>
+            </div>
+
+            <div class="total-line">
+              <span>Cantidad de combos</span>
+              <strong><span id="combos-total-text">1</span></strong>
+            </div>
+
+            <div class="total-line">
+              <span>Total en dólares</span>
+              <strong>$<span id="total-usd-text">5.00</span></strong>
+            </div>
+
+            <div class="total-line">
+              <span>Tasa BCV del día</span>
+              <strong>Bs <span id="tasa-bcv-text">--</span></strong>
+            </div>
+
+            <div class="total-line total-grand">
+              <span>Total en bolívares</span>
+              <strong>Bs <span id="total-bs-text">--</span></strong>
+            </div>
+          </div>
+
+          <div class="section-title-form">7. Pago</div>
+
+          <div class="question-box">
+            <label>Método de pago <span>*</span></label>
+            <select name="metodo" id="f-metodo" class="input-field" required onchange="mostrarDatosPago()">
+              <option value="">Selecciona una opción</option>
+              <option value="Pago móvil">Pago móvil</option>
+              <option value="Transferencia">Transferencia</option>
+              <option value="Efectivo $">Efectivo $</option>
+            </select>
+          </div>
+          
+          <div id="bloque-datos-pago" class="payment-hidden">
+            <button type="button" class="btn-payment-info" onclick="togglePago()">
+              Ver datos para transferir
+            </button>
+          
+            <div id="datos-pago" class="datos-pago">
+              <p><strong>Banco:</strong> Banco de Venezuela</p>
+              <p><strong>Titular:</strong> Nombre del responsable</p>
+              <p><strong>Cédula/RIF:</strong> V-00000000</p>
+              <p><strong>Teléfono pago móvil:</strong> 04XX-XXXXXXX</p>
+              <p><strong>Cuenta:</strong> 0102-0000-00-0000000000</p>
+            </div>
+          </div>
+          
+          <div class="question-box">
+            <label>Referencia de pago <span>*</span></label>
+            <input type="text" name="referencia" id="f-referencia" class="input-field" required placeholder="Últimos dígitos o referencia">
+            <p class="helper-text">Si su pago es en Efectivo $, por favor adjunte los números de serie.</p>
+          </div>
+          
+          <div class="question-box">
+            <label>Capture de la transferencia / pago <span>*</span></label>
+            <p class="helper-text">Si su pago es en Efectivo $, por favor adjunte foto del billete.</p>
+            <div class="file-box">
+              <input type="file" id="f-capture" name="capture" accept="image/*,.pdf" required>
+              <span class="file-note">Puedes subir una imagen o PDF del comprobante.</span>
+            </div>
+          </div>
+          
+        <button type="submit" class="btn-main submit-btn">Confirmar reserva</button>
+      </form>
+
+      <button onclick="cerrarFormulario()" class="close-form">✕ Cancelar y cerrar</button>
+    </div>
+  </div>
+</section>
+
+<section id="contacto" class="reveal">
+  <h2 class="section-title">Donaciones</h2>
+
+  <div class="contact-layout">
+    <div>
+      <h3>¿Te gustaría realizar un aporte?</h3>
+      <p> Si deseas apoyar el Arefest con un donativo, puedes hacer click en el ícono de WhatsApp y escribirnos. Tu aporte nos ayudaría a mejorar nuestra Casa de Estudios.</p>
+    </div>
+
+    <div class="phone-container">
+      <div class="phone-frame">
+        <div class="phone-screen">
+          <div class="camera-notch"></div>
+          <div class="phone-header">
+            <span id="phone-clock">12:00</span>
+            <span>📶 🔋</span>
+          </div>
+
+          <div class="phone-notification">
+            <div class="whatsapp-mini">
+              <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" width="18">
+            </div>
+            <div>
+              <strong>Akuai Eventos</strong>
+              <span>No olvides seguirnos en instagram... 🏔️</span>
+            </div>
+          </div>
+
+          <div class="apps-grid">
+            <a href="https://wa.me/584164715431?text=%C2%A1Hola%2C%20Akuai%20Eventos%21%F0%9F%91%8B%F0%9F%8F%BB%0A%0ASoy%20%28Nombre%20y%20Apellido%29%20y%20me%20encantar%C3%ADa%20realizar%20un%20donativo%20para%20Arefest.%E2%9C%A8%0A%0AMi%20aporte%20ser%C3%ADa%3A%20%28Monetario%20o%20Material%2C%20por%20favor%20especifique%29%20y%20me%20gustar%C3%ADa%20apoyar%20con%3A%20%28Por%20favor%2C%20mencione%20su%20aporte%29.%F0%9F%98%8A" target="_blank" class="app-item">              
+              <div class="app-icon whatsapp-bg">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" width="30">
+              </div>
+              <span>WhatsApp</span>
+            </a>
+
+            <a href="https://instagram.com/akuai_eventos" target="_blank" class="app-item">
+              <div class="app-icon instagram-bg">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/a/a5/Instagram_icon.png" width="32">
+              </div>
+              <span>Instagram</span>
+            </a>
+          </div>
+
+          <p class="phone-bottom">Haz click en los íconos</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<section class="footer-banner">
+  <img src="banner.png" alt="Akuai Eventos">
+</section>
+
+<footer>
+  <div class="wrap">
+    <p>© <span id="year"></span> Akuai Eventos · Mérida, Venezuela</p>
+    <small>Excelencia y calidad en cada detalle</small>
+  </div>
+</footer>
+
+<script src="script.js"></script>
+</body>
+</html>
