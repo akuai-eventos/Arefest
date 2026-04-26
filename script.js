@@ -4,6 +4,7 @@ const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzvD68OutaasdqHyPdL
 const form = document.getElementById("akuaiForm");
 const modalConfirm = document.getElementById("modal-confirm");
 const modalSuccess = document.getElementById("modal-success");
+const modalMessage = document.getElementById("modal-message");
 
 const PRECIO_COMBO_USD = 5;
 let TASA_BCV = 0;
@@ -21,6 +22,16 @@ let stockSabores = {
 function setText(id, value) {
   const el = document.getElementById(id);
   if (el) el.textContent = value;
+}
+
+function mostrarMensaje(texto, titulo = "Akuai Eventos") {
+  setText("message-title", titulo);
+  setText("message-text", texto);
+  if (modalMessage) modalMessage.style.display = "grid";
+}
+
+function cerrarMensaje() {
+  if (modalMessage) modalMessage.style.display = "none";
 }
 
 function formatoBs(monto) {
@@ -43,6 +54,13 @@ function obtenerFechaCompra() {
     hour: "2-digit",
     minute: "2-digit"
   });
+}
+
+function limpiarNombreArchivo(texto) {
+  return String(texto || "")
+    .trim()
+    .replace(/\s+/g, "_")
+    .replace(/[^\w\-]/g, "");
 }
 
 function mostrarFormulario() {
@@ -90,7 +108,6 @@ async function cargarTasaBCV() {
     if (data.ok && Number(data.tasa) > 0) {
       TASA_BCV = Number(data.tasa);
     } else {
-      console.warn("Respuesta sin tasa válida:", data);
       TASA_BCV = 0;
     }
   } catch (error) {
@@ -103,6 +120,10 @@ async function cargarTasaBCV() {
 
 function resetearSabores() {
   document.querySelectorAll("[data-sabor]").forEach(input => {
+    input.value = 0;
+  });
+
+  document.querySelectorAll("[data-bebida]").forEach(input => {
     input.value = 0;
   });
 }
@@ -118,12 +139,12 @@ function cambiarSabor(inputId, cambio) {
 
   if (cambio > 0) {
     if (seleccion.total >= combos) {
-      alert(`Ya elegiste los ${combos} sabor(es) necesarios.`);
+      mostrarMensaje(`Ya elegiste los ${combos} sabor(es) necesarios.`);
       return;
     }
 
     if (valorActual >= disponible) {
-      alert(`No hay más stock de ${sabor}. Disponible: ${disponible}`);
+      mostrarMensaje(`No hay más stock de ${sabor}. Disponible: ${disponible}.`);
       return;
     }
 
@@ -153,9 +174,43 @@ function obtenerSaboresSeleccionados() {
   return { sabores, total };
 }
 
-function obtenerBebidaSeleccionada() {
-  const bebida = document.querySelector('input[name="bebida"]:checked');
-  return bebida ? bebida.value : "";
+function obtenerBebidasSeleccionadas() {
+  const inputs = document.querySelectorAll("[data-bebida]");
+  const bebidas = [];
+  let total = 0;
+
+  inputs.forEach(input => {
+    const bebida = input.dataset.bebida;
+    const cantidad = Number(input.value || 0);
+
+    if (cantidad > 0) {
+      bebidas.push({ bebida, cantidad });
+      total += cantidad;
+    }
+  });
+
+  return { bebidas, total };
+}
+
+function cambiarBebida(inputId, cambio) {
+  const input = document.getElementById(inputId);
+  const combos = Number(document.getElementById("f-combos").value || 1);
+  const seleccion = obtenerBebidasSeleccionadas();
+
+  let valorActual = Number(input.value || 0);
+
+  if (cambio > 0) {
+    if (seleccion.total >= combos) {
+      mostrarMensaje(`Ya elegiste las ${combos} bebida(s) necesarias.`);
+      return;
+    }
+
+    input.value = valorActual + 1;
+  } else if (valorActual > 0) {
+    input.value = valorActual - 1;
+  }
+
+  actualizarResumenPedido();
 }
 
 function mostrarDatosPago() {
@@ -181,7 +236,7 @@ function togglePago() {
 function actualizarResumenPedido() {
   const combos = Number(document.getElementById("f-combos").value || 1);
   const seleccionSabores = obtenerSaboresSeleccionados();
-  const bebida = obtenerBebidaSeleccionada();
+  const seleccionBebidas = obtenerBebidasSeleccionadas();
   const totalUsd = combos * PRECIO_COMBO_USD;
   const totalBs = totalUsd * TASA_BCV;
 
@@ -192,11 +247,11 @@ function actualizarResumenPedido() {
     flavorSummary.style.color = seleccionSabores.total === combos ? "#2e7d32" : "#777";
   }
 
-  setText("drink-summary", bebida ? `Bebida seleccionada: ${bebida}` : "No has seleccionado bebida.");
+  setText("drink-summary", `Has seleccionado ${seleccionBebidas.total} de ${combos} bebida(s).`);
 
   const drinkSummary = document.getElementById("drink-summary");
   if (drinkSummary) {
-    drinkSummary.style.color = bebida ? "#2e7d32" : "#777";
+    drinkSummary.style.color = seleccionBebidas.total === combos ? "#2e7d32" : "#777";
   }
 
   setText("precio-combo-text", formatoUsd(PRECIO_COMBO_USD));
@@ -231,7 +286,7 @@ form.onsubmit = async function(e) {
 
   const combos = Number(document.getElementById("f-combos").value || 1);
   const seleccion = obtenerSaboresSeleccionados();
-  const bebida = obtenerBebidaSeleccionada();
+  const seleccionBebidas = obtenerBebidasSeleccionadas();
   const modalidad = document.querySelector('input[name="modalidad"]:checked');
   const metodo = document.getElementById("f-metodo").value;
   const referencia = document.getElementById("f-referencia").value.trim();
@@ -239,23 +294,43 @@ form.onsubmit = async function(e) {
   const totalUsd = combos * PRECIO_COMBO_USD;
   const totalBs = totalUsd * TASA_BCV;
 
-  if (!modalidad) return alert("Selecciona si te quedarás en las ponencias o solo retirarás el pedido.");
-  if (combos < 1) return alert("Debes seleccionar al menos 1 combo.");
-  if (seleccion.total !== combos) return alert(`La suma de sabores debe ser igual a la cantidad de combos. Seleccionaste ${seleccion.total} de ${combos}.`);
-  if (!bebida) return alert("Selecciona una bebida.");
-  if (!metodo) return alert("Selecciona un método de pago.");
-  if (!referencia) return alert("Coloca la referencia de pago.");
-  if (!capture) return alert("Debes subir el capture o comprobante de pago.");
-  if (combos > stockSabores["Dominó"]) return alert(`No hay suficiente stock de Dominó. Disponible: ${stockSabores["Dominó"]}`);
+  if (!modalidad) return mostrarMensaje("Selecciona si te quedarás en las ponencias o solo retirarás el pedido.");
+  if (combos < 1) return mostrarMensaje("Debes seleccionar al menos 1 combo.");
+
+  if (seleccion.total !== combos) {
+    return mostrarMensaje(`La suma de sabores debe ser igual a la cantidad de combos. Seleccionaste ${seleccion.total} de ${combos}.`);
+  }
+
+  if (seleccionBebidas.total !== combos) {
+    return mostrarMensaje(`La cantidad de bebidas debe ser igual a la cantidad de combos. Seleccionaste ${seleccionBebidas.total} de ${combos}.`);
+  }
+
+  if (!metodo) return mostrarMensaje("Selecciona un método de pago.");
+  if (!referencia) return mostrarMensaje("Coloca la referencia de pago.");
+  if (!capture) return mostrarMensaje("Debes subir el capture o comprobante de pago.");
+  if (combos > stockSabores["Dominó"]) return mostrarMensaje(`No hay suficiente stock de Dominó. Disponible: ${stockSabores["Dominó"]}.`);
 
   for (let item of seleccion.sabores) {
     const disponible = Number(stockSabores[item.sabor] || 0);
     if (item.cantidad > disponible) {
-      return alert(`No hay suficiente stock de ${item.sabor}. Disponible: ${disponible}`);
+      return mostrarMensaje(`No hay suficiente stock de ${item.sabor}. Disponible: ${disponible}.`);
     }
   }
 
-  const resumenSabores = seleccion.sabores.map(item => `${item.sabor} x${item.cantidad}`).join(", ");
+  const resumenSabores = seleccion.sabores
+    .map(item => `${item.sabor} x${item.cantidad}`)
+    .join(", ");
+
+  const resumenBebidas = seleccionBebidas.bebidas
+    .map(item => `${item.bebida} x${item.cantidad}`)
+    .join(", ");
+
+  const extension = capture.name.includes(".")
+    ? capture.name.substring(capture.name.lastIndexOf("."))
+    : "";
+
+  const referenciaLimpia = limpiarNombreArchivo(referencia);
+  const nombreCaptureConReferencia = `${referenciaLimpia}_capture${extension}`;
 
   reservaPendiente = {
     fecha: obtenerFechaCompra(),
@@ -273,14 +348,14 @@ form.onsubmit = async function(e) {
     rumbera: seleccion.sabores.find(x => x.sabor === "Rumbera")?.cantidad || 0,
     akuai: seleccion.sabores.find(x => x.sabor === "Akuai")?.cantidad || 0,
     domino: combos,
-    bebida: bebida,
+    bebida: resumenBebidas,
     precio_combo_usd: PRECIO_COMBO_USD,
     total_usd: formatoUsd(totalUsd),
     tasa: TASA_BCV,
     total_bs: formatoBs(totalBs),
     metodo: metodo,
     referencia: referencia,
-    capture_nombre: capture.name,
+    capture_nombre: nombreCaptureConReferencia,
     capture_tipo: capture.type,
     capture_base64: await archivoABase64(capture)
   };
@@ -290,10 +365,10 @@ form.onsubmit = async function(e) {
   setText("confirm-vendedor", reservaPendiente.vendedor);
   setText("confirm-modalidad", reservaPendiente.modalidad);
   setText("confirm-combo", `${combos} combo(s): Dominó x${combos} + ${resumenSabores}`);
-  setText("confirm-bebida", bebida);
+  setText("confirm-bebida", resumenBebidas);
   setText("confirm-metodo", metodo);
   setText("confirm-referencia", referencia);
-  setText("confirm-capture", capture.name);
+  setText("confirm-capture", nombreCaptureConReferencia);
   setText("confirm-total-usd", `$${formatoUsd(totalUsd)}`);
   setText("confirm-tasa-bcv", TASA_BCV > 0 ? `Bs ${formatoBs(TASA_BCV)}` : "No disponible");
   setText("confirm-total-bs", TASA_BCV > 0 ? `Bs ${formatoBs(totalBs)}` : "No disponible");
@@ -307,7 +382,7 @@ function cerrarConfirm() {
 
 async function mostrarExito() {
   if (!reservaPendiente) {
-    alert("No hay una reserva pendiente.");
+    mostrarMensaje("No hay una reserva pendiente.");
     return;
   }
 
@@ -356,7 +431,7 @@ async function mostrarExito() {
     actualizarResumenPedido();
 
   } catch (error) {
-    alert("Error al guardar la reserva: " + error.message);
+    mostrarMensaje("Error al guardar la reserva: " + error.message, "No se pudo guardar");
   } finally {
     const boton = document.querySelector(".btn-confirm");
     if (boton) {

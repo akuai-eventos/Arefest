@@ -46,6 +46,14 @@
   </div>
 </div>
 
+<div id="modal-message" class="modal-overlay">
+  <div class="custom-modal">
+    <h3 id="message-title">Akuai Eventos</h3>
+    <p id="message-text"></p>
+    <button class="btn-confirm full-btn" onclick="cerrarMensaje()">Aceptar</button>
+  </div>
+</div>
+
 <header>
   <div class="wrap topbar">
     <a href="#" class="brand">
@@ -355,25 +363,40 @@
           <div id="flavor-summary" class="helper-text">Has seleccionado 0 de 1 sabor(es) a elección.</div>
         </div>
 
-        <div class="section-title-form">5. Bebida</div>
+<div class="section-title-form">5. Bebida</div>
 
-        <div class="question-box">
-          <label>Paso 3: Selecciona una bebida <span>*</span></label>
-          <p class="helper-text">Selecciona una sola bebida para todos los combos de este pedido.</p>
+<div class="question-box">
+  <label>Paso 3: Selecciona bebidas <span>*</span></label>
+  <p class="helper-text">El total de bebidas debe ser igual a la cantidad de combos.</p>
 
-          <div class="grid-options">
-            <label class="option-item">
-              <input type="radio" name="bebida" value="Café" required onchange="actualizarResumenPedido()">
-              Café
-            </label>
-            <label class="option-item">
-              <input type="radio" name="bebida" value="Papelón con Limón" onchange="actualizarResumenPedido()">
-              Papelón con Limón
-            </label>
-          </div>
+  <div class="flavor-box">
+    <div class="flavor-row">
+      <div>
+        <strong>Café</strong>
+        <small>Bebida disponible</small>
+      </div>
+      <div class="qty-control">
+        <button type="button" class="qty-btn qty-minus" onclick="cambiarBebida('drink-cafe',-1)">−</button>
+        <input type="number" min="0" value="0" id="drink-cafe" data-bebida="Café" readonly>
+        <button type="button" class="qty-btn qty-plus" onclick="cambiarBebida('drink-cafe',1)">+</button>
+      </div>
+    </div>
 
-          <div id="drink-summary" class="helper-text">No has seleccionado bebida.</div>
-        </div>
+    <div class="flavor-row">
+      <div>
+        <strong>Papelón con Limón</strong>
+        <small>Bebida disponible</small>
+      </div>
+      <div class="qty-control">
+        <button type="button" class="qty-btn qty-minus" onclick="cambiarBebida('drink-papelon',-1)">−</button>
+        <input type="number" min="0" value="0" id="drink-papelon" data-bebida="Papelón con Limón" readonly>
+        <button type="button" class="qty-btn qty-plus" onclick="cambiarBebida('drink-papelon',1)">+</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="drink-summary" class="helper-text">Has seleccionado 0 de 1 bebida(s).</div>
+</div>
 
         <div class="section-title-form">6. Total</div>
 
