@@ -82,12 +82,16 @@ function cargarStockVisual() {
 
 async function cargarTasaBCV() {
   try {
-    const response = await fetch(`${WEB_APP_URL}?action=tasa`);
+    setText("tasa-bcv-text", "Cargando...");
+    setText("total-bs-text", "Cargando...");
+
+    const response = await fetch(`${WEB_APP_URL}?action=rate`);
     const data = await response.json();
 
     if (data.ok && Number(data.tasa) > 0) {
       TASA_BCV = Number(data.tasa);
     } else {
+      console.warn("Respuesta sin tasa válida:", data);
       TASA_BCV = 0;
     }
   } catch (error) {
