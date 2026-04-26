@@ -76,23 +76,56 @@ function cerrarFormulario() {
   document.getElementById("cta-content").style.display = "block";
 }
 
-function cargarStockVisual() {
-  stockSabores = {
-    "Catira": 25,
-    "Pelúa": 25,
-    "Reina Pepiada": 25,
-    "Rumbera": 25,
-    "Akuai": 25,
-    "Dominó": 162
-  };
+function pintarStock(idTexto, idInput, cantidad) {
+  const texto = document.getElementById(idTexto);
+  const input = document.getElementById(idInput);
 
-  setText("precio-combo-card", PRECIO_COMBO_USD);
-  setText("stock-message", "Selecciona cantidades según disponibilidad.");
-  setText("stock-catira", `Disponible: ${stockSabores["Catira"]}`);
-  setText("stock-pelua", `Disponible: ${stockSabores["Pelúa"]}`);
-  setText("stock-reina", `Disponible: ${stockSabores["Reina Pepiada"]}`);
-  setText("stock-rumbera", `Disponible: ${stockSabores["Rumbera"]}`);
-  setText("stock-akuai", `Disponible: ${stockSabores["Akuai"]}`);
+  if (!texto) return;
+
+  if (cantidad <= 0) {
+    texto.textContent = "AGOTADO";
+    texto.style.color = "#c62828";
+    if (input) input.disabled = true;
+  } else {
+    texto.textContent = `Disponible: ${cantidad}`;
+    texto.style.color = "#2e7d32";
+    if (input) input.disabled = false;
+  }
+}
+
+async function cargarStockVisual() {
+  try {
+    setText("stock-message", "Cargando disponibilidad real...");
+
+    const response = await fetch(`${WEB_APP_URL}?action=stock`);
+    const data = await response.json();
+
+    if (!data.ok) {
+      throw new Error(data.error || "No se pudo cargar el stock.");
+    }
+
+    stockSabores = {
+      "Catira": Number(data.stock["Catira"] || 0),
+      "Pelúa": Number(data.stock["Pelúa"] || 0),
+      "Reina Pepiada": Number(data.stock["Reina Pepiada"] || 0),
+      "Rumbera": Number(data.stock["Rumbera"] || 0),
+      "Akuai": Number(data.stock["Akuai"] || 0),
+      "Dominó": Number(data.stock["Dominó"] || 0)
+    };
+
+    setText("precio-combo-card", PRECIO_COMBO_USD);
+    setText("stock-message", "Selecciona cantidades según disponibilidad real.");
+
+    pintarStock("stock-catira", "flavor-catira", stockSabores["Catira"]);
+    pintarStock("stock-pelua", "flavor-pelua", stockSabores["Pelúa"]);
+    pintarStock("stock-reina", "flavor-reina", stockSabores["Reina Pepiada"]);
+    pintarStock("stock-rumbera", "flavor-rumbera", stockSabores["Rumbera"]);
+    pintarStock("stock-akuai", "flavor-akuai", stockSabores["Akuai"]);
+
+  } catch (error) {
+    console.warn("Error cargando stock:", error);
+    setText("stock-message", "No se pudo cargar el stock. Intenta nuevamente.");
+  }
 
   actualizarResumenPedido();
 }
