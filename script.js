@@ -413,8 +413,7 @@ async function mostrarExito() {
     datos.append("referencia", reservaPendiente.referencia);
     datos.append("capture", reservaPendiente.capture_nombre);
     datos.append("capture_base64", reservaPendiente.capture_base64);
-datos.append("capture_nombre", reservaPendiente.capture_nombre);
-
+    datos.append("capture_nombre", reservaPendiente.capture_nombre);
     const response = await fetch(WEB_APP_URL, {
       method: "POST",
       body: datos
