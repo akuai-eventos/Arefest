@@ -6,7 +6,7 @@ const modalConfirm = document.getElementById("modal-confirm");
 const modalSuccess = document.getElementById("modal-success");
 const modalMessage = document.getElementById("modal-message");
 
-const TOTAL_INICIAL_COMBOS = 162;
+const TOTAL_INICIAL_COMBOS = 100;
 let ultimoStockDomino = null;
 let intervaloStock = null;
 
