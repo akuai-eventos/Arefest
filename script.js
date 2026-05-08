@@ -114,7 +114,6 @@ async function cargarStockVisual() {
     const response = await fetch(`${WEB_APP_URL}?action=stock`);
     const data = await response.json();
 
-    // 🔥 SI TODO ESTÁ AGOTADO
     if (data.cerrado) {
       document.getElementById("akuaiForm").style.display = "none";
       setText("stock-message", "🔥 VENTAS CERRADAS - TODO AGOTADO");
@@ -133,7 +132,6 @@ async function cargarStockVisual() {
       throw new Error(data.error || "No se pudo cargar el stock.");
     }
 
-    // 🔥 STOCK ACTUAL
     stockSabores = {
       "Catira": Number(data.stock["Catira"] || 0),
       "Pelúa": Number(data.stock["Pelúa"] || 0),
@@ -147,7 +145,6 @@ async function cargarStockVisual() {
     const vendidos = TOTAL_INICIAL_COMBOS - disponiblesCombos;
     const porcentaje = Math.max(0, Math.min(100, (vendidos / TOTAL_INICIAL_COMBOS) * 100));
 
-    // 🔥 TEXTO INTELIGENTE
     let texto = "";
 
     if (disponiblesCombos <= 0) {
@@ -160,34 +157,26 @@ async function cargarStockVisual() {
 
     setText("stock-progress-text", texto);
 
-    // 🔥 BARRA ANIMADA
     const barra = document.getElementById("stock-progress-fill");
 
     if (barra) {
-      barra.style.width = "0%";
+      barra.style.width = `${porcentaje}%`;
 
-      setTimeout(() => {
-        barra.style.width = `${porcentaje}%`;
-
-        // 🎨 COLOR DINÁMICO
-        if (porcentaje >= 85) {
-          barra.style.background = "#c62828"; // rojo
-        } else if (porcentaje >= 55) {
-          barra.style.background = "#f9a825"; // amarillo
-        } else {
-          barra.style.background = "#2e7d32"; // verde
-        }
-      }, 200);
+      if (porcentaje >= 85) {
+        barra.style.background = "#c62828";
+      } else if (porcentaje >= 55) {
+        barra.style.background = "#f9a825";
+      } else {
+        barra.style.background = "#2e7d32";
+      }
     }
 
-    // 🔥 DETECTAR VENTAS (ANIMACIÓN +1)
     if (ultimoStockDomino !== null && disponiblesCombos < ultimoStockDomino) {
       animarVentaDetectada(ultimoStockDomino - disponiblesCombos);
     }
 
     ultimoStockDomino = disponiblesCombos;
 
-    // UI NORMAL
     setText("precio-combo-card", PRECIO_COMBO_USD);
     setText("stock-message", "Selecciona cantidades según disponibilidad real.");
 
@@ -232,9 +221,27 @@ function resetearSabores() {
     input.value = 0;
   });
 
-  document.querySelectorAll("[data-bebida]").forEach(input => {
-    input.value = 0;
-  });
+  actualizarBebidasAutomaticas();
+}
+
+function actualizarBebidasAutomaticas() {
+  const combos = Number(document.getElementById("f-combos").value || 1);
+
+  const cafe = document.getElementById("drink-cafe");
+  const papelon = document.getElementById("drink-papelon");
+
+  if (cafe) cafe.value = combos;
+  if (papelon) papelon.value = combos;
+
+  setText(
+    "drink-summary",
+    `Incluido automáticamente.`
+  );
+
+  const drinkSummary = document.getElementById("drink-summary");
+  if (drinkSummary) {
+    drinkSummary.style.color = "#2e7d32";
+  }
 }
 
 function cambiarSabor(inputId, cambio) {
@@ -307,42 +314,19 @@ function obtenerSaboresSeleccionados() {
 }
 
 function obtenerBebidasSeleccionadas() {
-  const inputs = document.querySelectorAll("[data-bebida]");
-  const bebidas = [];
-  let total = 0;
+  const combos = Number(document.getElementById("f-combos").value || 1);
 
-  inputs.forEach(input => {
-    const bebida = input.dataset.bebida;
-    const cantidad = Number(input.value || 0);
-
-    if (cantidad > 0) {
-      bebidas.push({ bebida, cantidad });
-      total += cantidad;
-    }
-  });
-
-  return { bebidas, total };
+  return {
+    bebidas: [
+      { bebida: "Café", cantidad: combos },
+      { bebida: "Papelón con Limón", cantidad: combos }
+    ],
+    total: combos * 2
+  };
 }
 
-function cambiarBebida(inputId, cambio) {
-  const input = document.getElementById(inputId);
-  const combos = Number(document.getElementById("f-combos").value || 1);
-  const seleccion = obtenerBebidasSeleccionadas();
-
-  let valorActual = Number(input.value || 0);
-
-  if (cambio > 0) {
-    if (seleccion.total >= combos) {
-      mostrarMensaje(`Ya elegiste las ${combos} bebida(s) necesarias.`);
-      return;
-    }
-
-    input.value = valorActual + 1;
-  } else if (valorActual > 0) {
-    input.value = valorActual - 1;
-  }
-
-  actualizarResumenPedido();
+function cambiarBebida() {
+  actualizarBebidasAutomaticas();
 }
 
 function mostrarDatosPago() {
@@ -367,8 +351,9 @@ function togglePago() {
 
 function actualizarResumenPedido() {
   const combos = Number(document.getElementById("f-combos").value || 1);
+  actualizarBebidasAutomaticas();
+
   const seleccionSabores = obtenerSaboresSeleccionados();
-  const seleccionBebidas = obtenerBebidasSeleccionadas();
   const totalUsd = combos * PRECIO_COMBO_USD;
   const totalBs = totalUsd * TASA_BCV;
 
@@ -377,13 +362,6 @@ function actualizarResumenPedido() {
   const flavorSummary = document.getElementById("flavor-summary");
   if (flavorSummary) {
     flavorSummary.style.color = seleccionSabores.total === combos ? "#2e7d32" : "#777";
-  }
-
-  setText("drink-summary", `Has seleccionado ${seleccionBebidas.total} de ${combos} bebida(s).`);
-
-  const drinkSummary = document.getElementById("drink-summary");
-  if (drinkSummary) {
-    drinkSummary.style.color = seleccionBebidas.total === combos ? "#2e7d32" : "#777";
   }
 
   setText("precio-combo-text", formatoUsd(PRECIO_COMBO_USD));
@@ -417,24 +395,20 @@ form.onsubmit = async function(e) {
   e.preventDefault();
 
   const combos = Number(document.getElementById("f-combos").value || 1);
+  actualizarBebidasAutomaticas();
+
   const seleccion = obtenerSaboresSeleccionados();
-  const seleccionBebidas = obtenerBebidasSeleccionadas();
-  const modalidad = document.querySelector('input[name="modalidad"]:checked');
+  const modalidad = { value: "Retiro" };
   const metodo = document.getElementById("f-metodo").value;
   const referencia = document.getElementById("f-referencia").value.trim();
   const capture = document.getElementById("f-capture").files[0];
   const totalUsd = combos * PRECIO_COMBO_USD;
   const totalBs = totalUsd * TASA_BCV;
 
-  if (!modalidad) return mostrarMensaje("Selecciona si te quedarás en las ponencias o solo retirarás el pedido.");
   if (combos < 1) return mostrarMensaje("Debes seleccionar al menos 1 combo.");
 
   if (seleccion.total !== combos) {
     return mostrarMensaje(`La suma de sabores debe ser igual a la cantidad de combos. Seleccionaste ${seleccion.total} de ${combos}.`);
-  }
-
-  if (seleccionBebidas.total !== combos) {
-    return mostrarMensaje(`La cantidad de bebidas debe ser igual a la cantidad de combos. Seleccionaste ${seleccionBebidas.total} de ${combos}.`);
   }
 
   if (!metodo) return mostrarMensaje("Selecciona un método de pago.");
@@ -453,9 +427,7 @@ form.onsubmit = async function(e) {
     .map(item => `${item.sabor} x${item.cantidad}`)
     .join(", ");
 
-  const resumenBebidas = seleccionBebidas.bebidas
-    .map(item => `${item.bebida} x${item.cantidad}`)
-    .join(", ");
+  const resumenBebidas = `Café x${combos}, Papelón con Limón x${combos}`;
 
   const extension = capture.name.includes(".")
     ? capture.name.substring(capture.name.lastIndexOf("."))
@@ -546,6 +518,7 @@ async function mostrarExito() {
     datos.append("capture", reservaPendiente.capture_nombre);
     datos.append("capture_base64", reservaPendiente.capture_base64);
     datos.append("capture_nombre", reservaPendiente.capture_nombre);
+
     const response = await fetch(WEB_APP_URL, {
       method: "POST",
       body: datos
@@ -645,6 +618,7 @@ function abrirPonente(img, nombre, titulo, desc) {
 function cerrarPonente() {
   document.getElementById("modal-ponente").style.display = "none";
 }
+
 window.onclick = function(event) {
   const modal = document.getElementById("modal-ponente");
   if (event.target === modal) {
@@ -721,6 +695,7 @@ async function actualizarStockEnTiempoReal() {
     pintarStock("stock-akuai", "flavor-akuai", stockSabores["Akuai"]);
 
     actualizarBarraStock(nuevoStockDomino);
+    actualizarBebidasAutomaticas();
 
     if (ultimoStockDomino !== null && nuevoStockDomino < ultimoStockDomino) {
       animarVentaDetectada(ultimoStockDomino - nuevoStockDomino);
@@ -743,3 +718,9 @@ async function actualizarStockEnTiempoReal() {
   }
 }
 
+window.addEventListener("DOMContentLoaded", () => {
+  actualizarBarraStock(TOTAL_INICIAL_COMBOS);
+  actualizarBebidasAutomaticas();
+  cargarStockVisual();
+  cargarTasaBCV();
+});
